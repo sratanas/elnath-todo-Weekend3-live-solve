@@ -12,7 +12,7 @@ router.get('/', function(req, res){
         res.sendStatus(500);
         
       } else {
-        db.query('SELECT * FROM tasks ORDER BY id;', function(errorMakingQuery, taskResult){
+        db.query('SELECT * FROM tasks ORDER BY is_complete, id;', function(errorMakingQuery, taskResult){
           done();
           if (errorMakingQuery){
             console.log('Error making query', errorMakingQuery);
@@ -47,4 +47,49 @@ router.get('/', function(req, res){
       })
   })
 
+router.put('/complete/:id', function(req, res){
+    pool.connect(function(errorConnectingToDatabase, db, done){
+        if (errorConnectingToDatabase){
+          console.log('Error connecting to database', errorConnectingToDatabase);
+          res.sendStatus(500);
+          
+        } else {
+          db.query(`UPDATE tasks SET is_complete = TRUE WHERE id = $1`, [req.params.id], function(errorMakingQuery, taskResult){
+            done();
+            if (errorMakingQuery){
+              console.log('Error making query', errorMakingQuery);
+              res.sendStatus(500);
+              
+            }else {
+              res.sendStatus(200);
+            }
+          })
+        }
+      })
+  })
+
+
+router.delete('/remove/:id', function(req, res){
+    pool.connect(function(errorConnectingToDatabase, db, done){
+        if (errorConnectingToDatabase){
+          console.log('Error connecting to database', errorConnectingToDatabase);
+          res.sendStatus(500);
+          
+        } else {
+          db.query(`DELETE FROM tasks WHERE id = $1`, [req.params.id], function(errorMakingQuery, taskResult){
+            done();
+            if (errorMakingQuery){
+              console.log('Error making query', errorMakingQuery);
+              res.sendStatus(500);
+              
+            }else {
+              res.sendStatus(200);
+            }
+          })
+        }
+      })
+  })
+
+
 module.exports = router;
+
